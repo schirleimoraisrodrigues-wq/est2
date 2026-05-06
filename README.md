@@ -12,7 +12,7 @@ O erro `404 File not found` do GitHub Pages acontece quando a origem publicada n
 
 Também há `.nojekyll` na raiz, em `docs/` e no build gerado para impedir processamento do Jekyll.
 
-O workflow também foi simplificado para não declarar `environment` na raiz do YAML; isso evita o erro de validação `Unexpected value 'environment'` que impedia o deploy e fazia o Pages continuar exibindo 404 com uma versão antiga.
+O workflow declara `environment` dentro do job `deploy`, não na raiz do YAML. Isso evita o erro de validação `Unexpected value 'environment'` e também atende à exigência do `actions/deploy-pages`, que precisa do ambiente `github-pages` no job de publicação.
 
 
 ## Refatoração minimalista
