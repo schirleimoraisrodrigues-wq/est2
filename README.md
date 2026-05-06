@@ -37,6 +37,7 @@ A interface agora organiza o estudo como um plantão acadêmico de engenharia, s
 - Diagnóstico de domínio com uma questão por vez, explicação, confiança e relatório final;
 - página de conteúdo com abas Teoria, Questões, Flashcards, Arquivos e Desempenho;
 - Central de Cadastro com seções para matérias, tópicos, conteúdos, questões, flashcards, provas, tarefas, eventos e arquivos;
+- tela de entrada no modelo de acesso com e-mail/senha e liberação imediata apenas pelo botão **Usar offline**, enquanto cadastro online não estiver ativo;
 - formulários completos em modal para criar/editar dados, sem `prompt`, `alert` ou cadastro em perguntas sequenciais.
 
 ## Como publicar sem erro

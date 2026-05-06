@@ -1,6 +1,7 @@
 const confidenceOptions = ['Chutei', 'Estava muito incerta', 'Estava em dúvida', 'Estava confiante', 'Sabia com certeza'];
 const eventTypes = ['prova', 'trabalho', 'tarefa', 'revisão', 'aula', 'apresentação', 'simulado', 'evento acadêmico', 'outro'];
 const storageKey = 'plantao-engenharia:v6';
+const accessKey = 'plantao-engenharia:access-mode';
 const today = '2026-05-06';
 const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
@@ -49,7 +50,8 @@ const seed = {
 };
 
 let state = loadState();
-let ui = { route: location.hash.replace('#', '') || '/', calendarMonth: '2026-05', selectedDay: today, modal: null, registryTab: 'subjects', contentTab: 'theory', subjectTab: 'overview', message: '', eventDetails: null };
+let accessMode = localStorage.getItem(accessKey) || '';
+let ui = { route: location.hash.replace('#', '') || '/', calendarMonth: '2026-05', selectedDay: today, modal: null, registryTab: 'subjects', contentTab: 'theory', subjectTab: 'overview', message: '', accessMessage: '', eventDetails: null };
 let session = null;
 
 function loadState() {
@@ -69,6 +71,30 @@ function formatDate(date) { return date ? date.split('-').reverse().join('/') : 
 function daysUntil(date) { return Math.ceil((new Date(`${date}T00:00:00`) - new Date(`${today}T00:00:00`)) / 86400000); }
 function setTheme(theme) { state.user.theme = theme; document.documentElement.dataset.theme = theme; save(); }
 setTheme(state.user.theme || 'light');
+
+function requestOnlineAccess(event) {
+  event.preventDefault();
+  ui.accessMessage = 'Acesso online e cadastro ainda não estão configurados. Como você ainda não tem conta, use o modo offline para acessar a plataforma agora.';
+  render();
+}
+function enterOffline() {
+  accessMode = 'offline';
+  localStorage.setItem(accessKey, accessMode);
+  ui.accessMessage = '';
+  if (!location.hash) location.hash = '/';
+  render();
+}
+function leaveOffline() {
+  accessMode = '';
+  localStorage.removeItem(accessKey);
+  session = null;
+  ui.modal = null;
+  ui.eventDetails = null;
+  render();
+}
+function accessPage() {
+  return `<main class="access-page"><section class="access-copy"><div class="access-mark">∿</div><span class="eyebrow">Central de estudos de engenharia</span><h1>Plantão da Engenharia</h1><p>Entre para sincronizar matérias, tópicos, questões, provas, revisões e arquivos quando sua conta estiver disponível.</p><div class="access-note"><strong>Sem cadastro ainda?</strong><span>O acesso online está em preparação. Por enquanto, use o modo offline para testar todos os recursos no navegador.</span></div></section><section class="access-card"><h2>Entrar</h2><form onsubmit="requestOnlineAccess(event)"><label>Email<input class="input" type="email" placeholder="seu@email.com" autocomplete="email"></label><label>Senha<input class="input" type="password" placeholder="Senha" autocomplete="current-password"></label><button class="btn primary access-submit" type="submit">Entrar</button></form>${ui.accessMessage ? `<div class="notice">${esc(ui.accessMessage)}</div>` : ''}<div class="access-links"><button class="link-button" onclick="ui.accessMessage='Cadastro online ainda não disponível. Use o modo offline para começar sem conta.'; render()">Criar conta</button><button class="link-button" onclick="ui.accessMessage='Recuperação de senha será liberada quando o acesso online estiver ativo.'; render()">Esqueci a senha</button><button class="link-button strong" onclick="enterOffline()">Usar offline</button></div></section></main>`;
+}
 
 const confidenceScore = { 'Chutei': .1, 'Estava muito incerta': .3, 'Estava em dúvida': .55, 'Estava em dúvida entre alternativas': .55, 'Estava confiante': .8, 'Sabia com certeza': 1 };
 function attemptsFor(filter) {
@@ -132,7 +158,7 @@ function layout(content) {
       <nav class="nav">${nav.map(([route, label, icon]) => `<button class="${ui.route === route ? 'active' : ''}" onclick="go('${route}')"><span>${icon}</span>${label}</button>`).join('')}</nav>
     </aside>
     <main class="main">
-      <header class="topbar"><button class="btn ghost mobile-menu" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button><div><span class="eyebrow">Olá, ${esc(state.user.name)}</span><h2>Plantão da Engenharia</h2></div><div class="topbar-actions"><span class="badge">Modo offline</span><button class="btn" onclick="go('/configuracoes')">Configurações</button><button class="btn" onclick="setTheme(state.user.theme === 'dark' ? 'light' : 'dark'); render()">${state.user.theme === 'dark' ? 'Modo claro' : 'Modo escuro'}</button></div></header>
+      <header class="topbar"><button class="btn ghost mobile-menu" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button><div><span class="eyebrow">Olá, ${esc(state.user.name)}</span><h2>Plantão da Engenharia</h2></div><div class="topbar-actions"><span class="badge">Modo offline</span><button class="btn" onclick="go('/configuracoes')">Configurações</button><button class="btn" onclick="setTheme(state.user.theme === 'dark' ? 'light' : 'dark'); render()">${state.user.theme === 'dark' ? 'Modo claro' : 'Modo escuro'}</button><button class="btn" onclick="leaveOffline()">Sair</button></div></header>
       <section class="content">${ui.message ? `<div class="notice">${esc(ui.message)} <button class="btn ghost" onclick="ui.message=''; render()">Fechar</button></div>` : ''}${content}</section>
     </main>
     ${ui.modal ? renderModal() : ''}
@@ -338,6 +364,7 @@ function submitModal(event, type, id) { event.preventDefault(); const collection
 function removeItem(collection, id) { state[collection] = state[collection].filter((item) => item.id !== id); save(); render(); }
 
 function render() {
+  if (accessMode !== 'offline') { document.getElementById('app').innerHTML = accessPage(); return; }
   const route = location.hash.replace('#', '') || ui.route || '/'; ui.route = route;
   if (route.startsWith('/materia/')) document.getElementById('app').innerHTML = subjectDetails(route.split('/').pop());
   else if (route.startsWith('/conteudo/')) document.getElementById('app').innerHTML = contentPage(route.split('/').pop());
