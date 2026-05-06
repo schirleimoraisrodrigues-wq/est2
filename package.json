@@ -1,0 +1,12 @@
+{
+  "name": "studyquest",
+  "private": true,
+  "version": "0.2.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/serve-static.mjs . 5173",
+    "build": "node scripts/build-static.mjs",
+    "preview": "node scripts/serve-static.mjs dist 4173",
+    "test": "node scripts/verify-pages.mjs"
+  }
+}
