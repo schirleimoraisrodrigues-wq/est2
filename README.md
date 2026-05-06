@@ -103,6 +103,16 @@ npm run build
 
 Esse comando usa apenas Node.js e copia `index.html`, `404.html` e `.nojekyll` para `dist/` e `docs/`. Ele não depende de `npm install`.
 
+## Gerar prévia visual sem navegador
+
+Este ambiente pode bloquear instalação de Chromium/Firefox por `apt` ou `npm`. Para evitar que a captura de tela dependa de um navegador instalado, o projeto inclui uma prévia estática em SVG gerada por Node.js puro:
+
+```bash
+npm run screenshot
+```
+
+O comando cria `screenshots/terminal-engenharia-dark-preview.svg` com a estética minimalista preta e laranja do modo noturno.
+
 ## Desenvolvimento futuro com React/Vite
 
 A estrutura React/Vite continua em `src/` para evolução do projeto. Se você quiser voltar ao build Vite completo depois de instalar dependências, use `npm run build:vite`.
