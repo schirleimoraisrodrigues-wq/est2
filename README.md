@@ -37,9 +37,18 @@ A interface agora organiza o estudo como um plantão acadêmico de engenharia, s
 - Diagnóstico de domínio com uma questão por vez, explicação, confiança e relatório final;
 - página de conteúdo com abas Teoria, Questões, Flashcards, Arquivos e Desempenho;
 - Central de Cadastro com seções para matérias, tópicos, conteúdos, questões, flashcards, provas, tarefas, eventos e arquivos;
-- tela de entrada com formulário de acesso e liberação apenas pelo botão **Usar offline** enquanto cadastro/login online não estão disponíveis;
+- tela de entrada com e-mail, senha, erro discreto para login inválido, cadastro local em LocalStorage e botão **Entrar offline** para uso sem autenticação real;
 - formulários completos em modal para criar/editar dados, sem `prompt`, `alert` ou cadastro em perguntas sequenciais.
 
+## Acesso, cadastro local e sessão
+
+A tela inicial agora bloqueia o painel até que o usuário escolha uma destas opções:
+
+- **Entrar offline**: libera todas as abas usando dados locais, sem backend.
+- **Fazer cadastro**: abre um formulário completo com nome, e-mail, senha e confirmação de senha, validando campos vazios e senhas diferentes.
+- **Entrar**: valida o e-mail e senha cadastrados no LocalStorage. Se não encontrar usuário, mostra a mensagem `Cadastro incorreto ou usuário não encontrado.` dentro da própria tela.
+
+No Painel Geral e no topo das demais abas há botões minimalistas para configurações, alternar tema claro/escuro e sair. O botão de sair encerra a sessão local/offline e volta para a tela de entrada.
 
 ## Correção de deploy para evitar 404
 

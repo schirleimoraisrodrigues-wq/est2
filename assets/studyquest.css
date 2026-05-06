@@ -148,3 +148,14 @@ label { display: grid; gap: 6px; color: var(--muted); font-size: 13px; font-weig
 .link-button.strong { color: var(--muted); }
 .access-notice { display:block; margin: 12px 0 0; }
 @media (max-width: 880px) { .access-page { grid-template-columns: 1fr; padding: 24px; } .access-copy p { font-size: 16px; } }
+.icon-btn { min-width: 42px; min-height: 42px; display: inline-grid; place-items: center; padding: 9px; font-size: 17px; }
+.access-form { display: grid; gap: 14px; }
+.access-subtitle { margin: -8px 0 18px; }
+.notice.error { border-left-color: var(--danger); background: color-mix(in srgb, var(--danger) 8%, var(--panel)); color: var(--text); }
+.notice.success { border-left-color: var(--ok); background: color-mix(in srgb, var(--ok) 8%, var(--panel)); color: var(--text); }
+.notice.info { border-left-color: var(--accent); }
+.hero { color: var(--text); background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 7%, var(--panel)), var(--panel)); }
+.hero .muted, .hero .eyebrow { color: var(--muted); }
+.hero .card { background: var(--panel); border-color: var(--border); color: var(--text); }
+[data-theme="dark"] .hero { background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 12%, var(--panel)), var(--panel)); }
+@media (max-width: 700px) { .topbar-actions { justify-content: flex-end; flex-wrap: wrap; } .badge { display: none; } }

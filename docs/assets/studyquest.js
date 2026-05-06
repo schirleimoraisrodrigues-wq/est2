@@ -2,6 +2,8 @@ const confidenceOptions = ['Chutei', 'Estava muito incerta', 'Estava em dúvida'
 const eventTypes = ['prova', 'trabalho', 'tarefa', 'revisão', 'aula', 'apresentação', 'simulado', 'evento acadêmico', 'outro'];
 const storageKey = 'plantao-engenharia:v6';
 const accessKey = 'plantao-engenharia:access-mode';
+const usersKey = 'plantao-engenharia:users';
+const sessionKey = 'plantao-engenharia:session';
 const today = '2026-05-06';
 const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
@@ -51,8 +53,9 @@ const seed = {
 
 let state = loadState();
 let hasOfflineAccess = localStorage.getItem(accessKey) === 'offline';
-let ui = { route: location.hash.replace('#', '') || '/', calendarMonth: '2026-05', selectedDay: today, modal: null, registryTab: 'subjects', contentTab: 'theory', subjectTab: 'overview', message: '', accessMessage: '', eventDetails: null };
+let authSession = readSession();
 let session = null;
+let ui = { route: location.hash.replace('#', '') || '/', calendarMonth: '2026-05', selectedDay: today, modal: null, registryTab: 'subjects', contentTab: 'theory', subjectTab: 'overview', message: '', accessMode: 'login', accessMessage: '', accessMessageType: 'info', eventDetails: null };
 
 function loadState() {
   const stored = localStorage.getItem(storageKey);
@@ -72,32 +75,116 @@ function daysUntil(date) { return Math.ceil((new Date(`${date}T00:00:00`) - new 
 function setTheme(theme) { state.user.theme = theme; document.documentElement.dataset.theme = theme; save(); }
 setTheme(state.user.theme || 'light');
 
+function readUsers() {
+  try { return JSON.parse(localStorage.getItem(usersKey) || '[]'); }
+  catch { return []; }
+}
+function saveUsers(users) { localStorage.setItem(usersKey, JSON.stringify(users)); }
+function readSession() {
+  try { return JSON.parse(localStorage.getItem(sessionKey) || 'null'); }
+  catch { return null; }
+}
+function currentUserName() { return authSession?.name || state.user.name || 'Estudante'; }
+function hasAccess() { return hasOfflineAccess || Boolean(authSession); }
+
 function accessPage() {
+  const isRegister = ui.accessMode === 'register';
   return `<main class="access-page">
     <section class="access-copy">
       <div class="brand-mark access-mark">∿</div>
       <span class="eyebrow">Plataforma de estudos de engenharia</span>
       <h1>Plantão da Engenharia</h1>
-      <p>Entre para sincronizar seus estudos quando o cadastro estiver disponível. Por enquanto, use o modo offline para acessar o painel, agenda, fila de estudos e diagnóstico.</p>
-      <div class="access-highlights"><span>✓ Dados locais</span><span>✓ Diagnóstico por questões</span><span>✓ Calendário e cadastros</span></div>
+      <p>Organize matérias, tópicos, conteúdos, eventos e sessões de questões em uma rotina minimalista de estudo ativo.</p>
+      <div class="access-highlights"><span>✓ Questões por conteúdo</span><span>✓ Agenda mensal</span><span>✓ Modo offline</span></div>
     </section>
     <section class="access-card">
-      <h2>Entrar</h2>
-      <label>Email<input class="input" type="email" placeholder="seu@email.com" autocomplete="email"></label>
-      <label>Senha<input class="input" type="password" placeholder="Sua senha" autocomplete="current-password"></label>
-      <button class="btn primary" onclick="showAccessMessage('O login online ainda não está disponível. Use o modo offline para entrar agora.')">Entrar</button>
-      ${ui.accessMessage ? `<div class="notice access-notice">${esc(ui.accessMessage)}</div>` : ''}
-      <div class="access-links">
-        <button class="link-button" onclick="showAccessMessage('Cadastro online ainda não liberado. O acesso atual é pelo modo offline.')">Criar conta</button>
-        <button class="link-button" onclick="showAccessMessage('Recuperação de senha ficará disponível com a autenticação online.')">Esqueci a senha</button>
-        <button class="link-button strong" onclick="enterOfflineMode()">Usar offline</button>
-      </div>
+      ${isRegister ? registerForm() : loginForm()}
     </section>
   </main>`;
 }
-function showAccessMessage(message) { ui.accessMessage = message; render(); }
-function enterOfflineMode() { hasOfflineAccess = true; localStorage.setItem(accessKey, 'offline'); ui.accessMessage = ''; go('/'); }
-function signOut() { hasOfflineAccess = false; localStorage.removeItem(accessKey); ui.route = '/acesso'; location.hash = '/acesso'; render(); }
+function loginForm() {
+  return `<h2>Entrar</h2>
+    <p class="muted access-subtitle">Use seu cadastro local ou entre offline para acessar agora.</p>
+    <form onsubmit="loginUser(event)" class="access-form">
+      <label>E-mail<input class="input" name="email" type="email" placeholder="seu@email.com" autocomplete="email" required></label>
+      <label>Senha<input class="input" name="password" type="password" placeholder="Sua senha" autocomplete="current-password" required></label>
+      <button class="btn primary" type="submit">Entrar</button>
+    </form>
+    ${accessNotice()}
+    <div class="access-links">
+      <button class="link-button" onclick="showRegisterForm()">Fazer cadastro</button>
+      <button class="link-button strong" onclick="enterOfflineMode()">Entrar offline</button>
+    </div>`;
+}
+function registerForm() {
+  return `<h2>Fazer cadastro</h2>
+    <p class="muted access-subtitle">Cadastro temporário salvo somente neste navegador.</p>
+    <form onsubmit="registerUser(event)" class="access-form">
+      <label>Nome<input class="input" name="name" type="text" placeholder="Seu nome" autocomplete="name" required></label>
+      <label>E-mail<input class="input" name="email" type="email" placeholder="seu@email.com" autocomplete="email" required></label>
+      <label>Senha<input class="input" name="password" type="password" placeholder="Crie uma senha" autocomplete="new-password" required></label>
+      <label>Confirmar senha<input class="input" name="confirmPassword" type="password" placeholder="Repita a senha" autocomplete="new-password" required></label>
+      <button class="btn primary" type="submit">Cadastrar</button>
+      <button class="btn" type="button" onclick="showLoginForm()">Voltar para entrada</button>
+    </form>
+    ${accessNotice()}`;
+}
+function accessNotice() { return ui.accessMessage ? `<div class="notice access-notice ${ui.accessMessageType}">${esc(ui.accessMessage)}</div>` : ''; }
+function showAccessMessage(message, type = 'info') { ui.accessMessage = message; ui.accessMessageType = type; render(); }
+function showRegisterForm() { ui.accessMode = 'register'; ui.accessMessage = ''; render(); }
+function showLoginForm(message = '', type = 'info') { ui.accessMode = 'login'; ui.accessMessage = message; ui.accessMessageType = type; render(); }
+function normalizedEmail(value) { return String(value || '').trim().toLowerCase(); }
+function loginUser(event) {
+  event.preventDefault();
+  const form = new FormData(event.target);
+  const email = normalizedEmail(form.get('email'));
+  const password = String(form.get('password') || '');
+  const user = readUsers().find((candidate) => candidate.email === email && candidate.password === password);
+  if (!user) { showAccessMessage('Cadastro incorreto ou usuário não encontrado.', 'error'); return; }
+  authSession = { id: user.id, name: user.name, email: user.email, mode: 'local' };
+  hasOfflineAccess = false;
+  state.user.name = user.name;
+  localStorage.setItem(sessionKey, JSON.stringify(authSession));
+  localStorage.removeItem(accessKey);
+  save();
+  ui.accessMessage = '';
+  go('/');
+}
+function registerUser(event) {
+  event.preventDefault();
+  const form = new FormData(event.target);
+  const name = String(form.get('name') || '').trim();
+  const email = normalizedEmail(form.get('email'));
+  const password = String(form.get('password') || '');
+  const confirmPassword = String(form.get('confirmPassword') || '');
+  if (!name || !email || !password || !confirmPassword) { showAccessMessage('Preencha todos os campos para continuar.', 'error'); return; }
+  if (password !== confirmPassword) { showAccessMessage('As senhas não são iguais.', 'error'); return; }
+  const users = readUsers();
+  if (users.some((user) => user.email === email)) { showAccessMessage('Este e-mail já está cadastrado.', 'error'); return; }
+  users.push({ id: uid('user'), name, email, password, createdAt: today });
+  saveUsers(users);
+  showLoginForm('Cadastro realizado com sucesso. Entre com seu e-mail e senha.', 'success');
+}
+function enterOfflineMode() {
+  hasOfflineAccess = true;
+  authSession = null;
+  localStorage.setItem(accessKey, 'offline');
+  localStorage.removeItem(sessionKey);
+  ui.accessMessage = '';
+  go('/');
+}
+function signOut() {
+  hasOfflineAccess = false;
+  authSession = null;
+  session = null;
+  localStorage.removeItem(accessKey);
+  localStorage.removeItem(sessionKey);
+  ui.route = '/acesso';
+  ui.accessMode = 'login';
+  ui.accessMessage = '';
+  location.hash = '/acesso';
+  render();
+}
 
 const confidenceScore = { 'Chutei': .1, 'Estava muito incerta': .3, 'Estava em dúvida': .55, 'Estava em dúvida entre alternativas': .55, 'Estava confiante': .8, 'Sabia com certeza': 1 };
 function attemptsFor(filter) {
@@ -161,7 +248,7 @@ function layout(content) {
       <nav class="nav">${nav.map(([route, label, icon]) => `<button class="${ui.route === route ? 'active' : ''}" onclick="go('${route}')"><span>${icon}</span>${label}</button>`).join('')}</nav>
     </aside>
     <main class="main">
-      <header class="topbar"><button class="btn ghost mobile-menu" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button><div><span class="eyebrow">Olá, ${esc(state.user.name)}</span><h2>Plantão da Engenharia</h2></div><div class="topbar-actions"><span class="badge">Modo offline</span><button class="btn" onclick="go('/configuracoes')">Configurações</button><button class="btn" onclick="setTheme(state.user.theme === 'dark' ? 'light' : 'dark'); render()">${state.user.theme === 'dark' ? 'Modo claro' : 'Modo escuro'}</button><button class="btn" onclick="signOut()">Sair</button></div></header>
+      <header class="topbar"><button class="btn ghost mobile-menu" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button><div><span class="eyebrow">Olá, ${esc(currentUserName())}</span><h2>Plantão da Engenharia</h2></div><div class="topbar-actions"><span class="badge">${authSession?.mode === 'local' ? 'Conta local' : 'Modo offline'}</span><button class="btn icon-btn" title="Configurações" onclick="go('/configuracoes')">⚙</button><button class="btn icon-btn" title="Alternar tema" onclick="setTheme(state.user.theme === 'dark' ? 'light' : 'dark'); render()">${state.user.theme === 'dark' ? '☀️' : '🌙'}</button><button class="btn icon-btn" title="Sair" onclick="signOut()">🚪</button></div></header>
       <section class="content">${ui.message ? `<div class="notice">${esc(ui.message)} <button class="btn ghost" onclick="ui.message=''; render()">Fechar</button></div>` : ''}${content}</section>
     </main>
     ${ui.modal ? renderModal() : ''}
@@ -176,7 +263,7 @@ function dashboard() {
   const nextExam = [...state.exams].sort((a, b) => a.date.localeCompare(b.date))[0];
   const queue = studyQueue();
   const critical = queue.filter((item) => item.zone === 'critical').length;
-  return layout(`<section class="hero"><div class="between"><div><span class="eyebrow">Olá, ${esc(state.user.name)}</span><h1>Plantão da Engenharia</h1><h2>Painel Geral</h2><p>Modo offline. Hoje vale focar nos temas da prova mais próxima e nas revisões pendentes.</p></div><div class="row"><button class="btn" onclick="go('/configuracoes')">Configurações</button><button class="btn" onclick="setTheme(state.user.theme === 'dark' ? 'light' : 'dark'); render()">${state.user.theme === 'dark' ? 'Modo claro' : 'Modo escuro'}</button></div></div><div class="grid cols-5">${statCard('Próxima prova', nextExam ? `${nextExam.title} · ${relativeDay(nextExam.date)}` : 'Sem prova')}${statCard('Fila de estudos', `${queue.length} tópicos`)}${statCard('Revisões vencidas', dueReviews().length)}${statCard('Tarefas atrasadas', overdueTasks().length)}${statCard('Prioridade crítica', critical)}</div></section>
+  return layout(`<section class="hero"><div class="between"><div><span class="eyebrow">Olá, ${esc(currentUserName())}</span><h1>Plantão da Engenharia</h1><h2>Painel Geral</h2><p>${authSession?.mode === 'local' ? 'Conta local ativa.' : 'Modo offline.'} Hoje vale focar nos temas da prova mais próxima e nas revisões pendentes.</p></div><div class="row"><button class="btn icon-btn" title="Configurações" onclick="go('/configuracoes')">⚙</button><button class="btn icon-btn" title="Alternar tema" onclick="setTheme(state.user.theme === 'dark' ? 'light' : 'dark'); render()">${state.user.theme === 'dark' ? '☀️' : '🌙'}</button><button class="btn icon-btn" title="Sair" onclick="signOut()">🚪</button></div></div><div class="grid cols-5">${statCard('Próxima prova', nextExam ? `${nextExam.title} · ${relativeDay(nextExam.date)}` : 'Sem prova')}${statCard('Fila de estudos', `${queue.length} tópicos`)}${statCard('Revisões vencidas', dueReviews().length)}${statCard('Tarefas atrasadas', overdueTasks().length)}${statCard('Prioridade crítica', critical)}</div></section>
   <div class="grid cols-2" style="margin-top:18px"><section class="card"><div class="between"><div><span class="eyebrow">Agenda rápida</span><h2>Calendário de estudos</h2></div><button class="btn" onclick="go('/agenda')">Ver agenda</button></div>${calendar('dash')}<div class="list" style="margin-top:12px">${dayEventsHtml()}</div></section><section class="card"><span class="eyebrow">Mapa de Prioridades</span><h2>Mapa operacional</h2>${priorityMap(true)}</section></div>
   <div class="grid cols-2" style="margin-top:18px"><section class="card"><div class="between"><div><span class="eyebrow">Agenda rápida</span><h2>Provas próximas</h2></div><button class="btn" onclick="go('/provas')">Ver provas</button></div>${upcomingExamsHtml()}</section><section class="card"><div class="between"><div><span class="eyebrow">Revisões Prioritárias</span><h2>Conteúdos para retorno</h2></div><button class="btn" onclick="go('/central-estudos')">Ver central</button></div>${priorityReturnsHtml()}</section></div>
   <section style="margin-top:22px"><div class="between"><div><span class="eyebrow">Fila de Estudos</span><h1>Tópicos para diagnóstico</h1><p class="muted">Conteúdos puxam a fila quando há prova próxima, baixa confiança ou revisão vencida.</p></div><button class="btn" onclick="go('/cadastro')">Ir para Central de Cadastro</button></div>${studyQueueHtml()}</section>`);
@@ -368,7 +455,7 @@ function removeItem(collection, id) { state[collection] = state[collection].filt
 
 function render() {
   const route = location.hash.replace('#', '') || ui.route || '/'; ui.route = route;
-  if (!hasOfflineAccess || route === '/acesso') { document.getElementById('app').innerHTML = accessPage(); return; }
+  if (!hasAccess() || route === '/acesso') { document.getElementById('app').innerHTML = accessPage(); return; }
   if (route.startsWith('/materia/')) document.getElementById('app').innerHTML = subjectDetails(route.split('/').pop());
   else if (route.startsWith('/conteudo/')) document.getElementById('app').innerHTML = contentPage(route.split('/').pop());
   else if (route === '/') document.getElementById('app').innerHTML = dashboard();
