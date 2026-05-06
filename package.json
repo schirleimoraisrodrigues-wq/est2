@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "vite build",
-    "preview": "vite preview --host 0.0.0.0"
+    "build": "node scripts/build-static.mjs",
+    "preview": "vite preview --host 0.0.0.0",
+    "build:vite": "vite build"
   },
   "dependencies": {
     "vite": "latest",

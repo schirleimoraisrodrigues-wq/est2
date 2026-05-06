@@ -1,30 +1,37 @@
 # StudyQuest
 
-StudyQuest é uma plataforma pessoal de organização e gamificação de estudos criada com React, Vite, Tailwind CSS e React Router.
+StudyQuest é uma plataforma pessoal de organização e gamificação de estudos.
 
-## Rodando localmente
+## Correção do GitHub Pages
 
-```bash
-npm install
-npm run dev
-```
+Este repositório agora possui um `index.html` estático e autossuficiente na raiz. Isso significa que a opção **Settings → Pages → Build and deployment → Deploy from a branch → main → /(root)** funciona sem etapa de build e sem depender de pacotes externos.
 
-## Gerando a página para produção
+Também existe um `404.html` igual ao `index.html` para evitar erro em rotas internas e um workflow opcional em `.github/workflows/deploy-pages.yml` para gerar `dist/` com `npm run build` e publicar o mesmo site usando **GitHub Actions** sem instalar dependências.
+
+## Como publicar
+
+### Opção mais simples: Deploy from a branch
+
+1. Vá em **Settings → Pages**.
+2. Em **Source**, escolha **Deploy from a branch**.
+3. Em **Branch**, escolha `main` e a pasta `/(root)`.
+4. Clique em **Save**.
+5. Aguarde alguns minutos e recarregue a URL do GitHub Pages.
+
+### Opção alternativa: GitHub Actions
+
+1. Vá em **Settings → Pages**.
+2. Em **Source**, escolha **GitHub Actions**.
+3. Rode o workflow **Deploy StudyQuest to GitHub Pages**.
+
+## Gerar `dist/` localmente
 
 ```bash
 npm run build
 ```
 
-O Vite gera a página estática dentro da pasta `dist/`, incluindo o arquivo `dist/index.html` que o GitHub Pages precisa publicar.
+Esse comando usa apenas Node.js e copia `index.html`, `404.html` e `.nojekyll` para `dist/`, garantindo que a página sempre seja gerada.
 
-## Publicação no GitHub Pages
+## Desenvolvimento futuro com React/Vite
 
-Este repositório inclui o workflow `.github/workflows/deploy-pages.yml`, que instala as dependências, executa `npm run build`, copia `dist/index.html` para `dist/404.html` para funcionar com rotas do React Router e publica a pasta `dist` no GitHub Pages.
-
-Para usar:
-
-1. No GitHub, abra **Settings → Pages**.
-2. Em **Build and deployment**, selecione **GitHub Actions** como fonte.
-3. Faça push na branch `main` ou `master`, ou rode manualmente o workflow **Deploy StudyQuest to GitHub Pages**.
-
-Isso evita o erro `404 File not found`, porque o GitHub Pages passa a receber o `index.html` gerado no build em vez de tentar servir uma pasta sem HTML publicado.
+A estrutura React/Vite continua em `src/` para evolução do projeto. Se você quiser voltar ao build Vite completo depois de instalar dependências, use `npm run build:vite`. O arquivo raiz `index.html` garante que a página publicada no GitHub Pages não quebre enquanto o ambiente de build ou a configuração do Pages não estiverem prontos.
