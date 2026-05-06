@@ -1,0 +1,21 @@
+{
+  "name": "studyquest",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "node scripts/build-static.mjs",
+    "preview": "vite preview --host 0.0.0.0",
+    "build:vite": "vite build"
+  },
+  "dependencies": {
+    "vite": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "react-router-dom": "latest"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}
