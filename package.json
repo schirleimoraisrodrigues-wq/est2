@@ -1,21 +1,12 @@
 {
   "name": "studyquest",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host 0.0.0.0",
+    "dev": "node scripts/serve-static.mjs . 5173",
     "build": "node scripts/build-static.mjs",
-    "preview": "vite preview --host 0.0.0.0",
-    "build:vite": "vite build"
-  },
-  "dependencies": {
-    "vite": "latest",
-    "react": "latest",
-    "react-dom": "latest",
-    "react-router-dom": "latest"
-  },
-  "devDependencies": {
-    "tailwindcss": "^3.4.17"
+    "preview": "node scripts/serve-static.mjs dist 4173",
+    "test": "node scripts/verify-pages.mjs"
   }
 }

@@ -1,37 +1,49 @@
 # StudyQuest
 
-StudyQuest é uma plataforma pessoal de organização e gamificação de estudos.
+StudyQuest é uma plataforma pessoal de organização e gamificação de estudos que roda como site estático autossuficiente no GitHub Pages.
 
-## Correção do GitHub Pages
+## O que foi feito para eliminar o erro 404
 
-Este repositório agora possui um `index.html` estático e autossuficiente na raiz. Isso significa que a opção **Settings → Pages → Build and deployment → Deploy from a branch → main → /(root)** funciona sem etapa de build e sem depender de pacotes externos.
+O projeto agora contém os arquivos exigidos pelo GitHub Pages em **três destinos seguros**:
 
-Também existe um `404.html` igual ao `index.html` para evitar erro em rotas internas e um workflow opcional em `.github/workflows/deploy-pages.yml` para gerar `dist/` com `npm run build` e publicar o mesmo site usando **GitHub Actions** sem instalar dependências.
+- `index.html` e `404.html` na raiz, para **Deploy from a branch → main → /(root)**.
+- `docs/index.html` e `docs/404.html`, para **Deploy from a branch → main → /docs** caso você prefira trocar a pasta publicada.
+- `dist/index.html` e `dist/404.html`, gerados por `npm run build`, para publicação via **GitHub Actions**.
 
-## Como publicar
+O app publicado não depende de Vite, React, `node_modules`, `/src/main.jsx` nem assets gerados. Por isso, mesmo sem instalar dependências, a página é servida pelo GitHub Pages.
 
-### Opção mais simples: Deploy from a branch
+## Configuração recomendada no GitHub Pages
+
+### Opção 1 — Branch root, igual ao print
+
+1. Faça merge/push deste código na branch `main`.
+2. Vá em **Settings → Pages**.
+3. Em **Source**, escolha **Deploy from a branch**.
+4. Em **Branch**, escolha `main` e `/(root)`.
+5. Clique em **Save** e aguarde alguns minutos.
+
+### Opção 2 — Branch docs
+
+Se o GitHub Pages continuar mostrando cache antigo:
 
 1. Vá em **Settings → Pages**.
-2. Em **Source**, escolha **Deploy from a branch**.
-3. Em **Branch**, escolha `main` e a pasta `/(root)`.
+2. Mantenha **Deploy from a branch**.
+3. Escolha `main` e `/docs`.
 4. Clique em **Save**.
-5. Aguarde alguns minutos e recarregue a URL do GitHub Pages.
 
-### Opção alternativa: GitHub Actions
+### Opção 3 — GitHub Actions
 
 1. Vá em **Settings → Pages**.
 2. Em **Source**, escolha **GitHub Actions**.
 3. Rode o workflow **Deploy StudyQuest to GitHub Pages**.
 
-## Gerar `dist/` localmente
+## Testes locais
 
 ```bash
+npm install
+npm test
 npm run build
+npm run dev
 ```
 
-Esse comando usa apenas Node.js e copia `index.html`, `404.html` e `.nojekyll` para `dist/`, garantindo que a página sempre seja gerada.
-
-## Desenvolvimento futuro com React/Vite
-
-A estrutura React/Vite continua em `src/` para evolução do projeto. Se você quiser voltar ao build Vite completo depois de instalar dependências, use `npm run build:vite`. O arquivo raiz `index.html` garante que a página publicada no GitHub Pages não quebre enquanto o ambiente de build ou a configuração do Pages não estiverem prontos.
+O comando `npm install` não baixa dependências porque o app estático não precisa de pacotes externos para funcionar.
