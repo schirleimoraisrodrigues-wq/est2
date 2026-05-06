@@ -8,7 +8,7 @@ const today = '2026-05-06';
 const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
 const seed = {
-  user: { id: 'user-demo', name: 'Estudante', xp: 920, dailyGoal: 12, weeklyGoal: 60, theme: 'light' },
+  user: { id: 'user-demo', name: 'Estudante', dailyGoal: 12, weeklyGoal: 60, theme: 'light' },
   subjects: [
     { id: 'sub-fluidos', name: 'Mecânica dos Fluidos', description: 'Escoamentos, pressão, vazão e conservação de energia.', color: '#0f766e', createdAt: '2026-05-01' },
     { id: 'sub-calculo', name: 'Cálculo II', description: 'Integrais múltiplas, séries e campos vetoriais.', color: '#334155', createdAt: '2026-05-01' },
@@ -236,7 +236,6 @@ function go(route) { ui.route = route; location.hash = route; render(); }
 function openModal(type, id = '', defaults = {}) { ui.modal = { type, id, defaults }; render(); }
 function closeModal() { ui.modal = null; render(); }
 function setMessage(text) { ui.message = text; render(); }
-function xpLevel() { return Math.floor(state.user.xp / 250) + 1; }
 
 function layout(content) {
   const nav = [
@@ -296,7 +295,7 @@ function priorityMap(compact = false) {
   const zones = [
     ['critical', 'Zona Crítica', 'Dificuldade grave. Precisa estudar teoria completa antes de avançar.'],
     ['high', 'Alta Prioridade', 'Existe alguma base, mas ainda há lacunas importantes.'],
-    ['moderate', 'Atenção Moderada', 'Foque nos erros e nos pontos específicos.'],
+    ['moderate', 'Atenção Moderada', 'Foque nos erros e nas lacunas específicas.'],
     ['stable', 'Domínio Estável', 'O domínio parece bom. Continue revisando para manter.'],
   ];
   const queue = studyQueue();
@@ -404,11 +403,11 @@ function sessionHtml() {
 }
 function answerCurrent() { if (!session.selected) return setMessage('Selecione uma alternativa antes de responder.'); session.answered = true; render(); }
 function answeredBlock(q) { const correct = session.selected === q.correctAnswer; return `<div class="notice" style="margin-top:14px"><strong>${correct ? 'Você acertou.' : 'Você errou.'}</strong><p>${esc(q.explanation)}</p><p class="muted">Resposta correta: ${esc(q.correctAnswer)}</p></div><label style="margin-top:12px">Como você se sentiu ao responder?<select class="input" onchange="session.confidence=this.value">${confidenceOptions.map((option) => `<option ${session.confidence === option ? 'selected' : ''}>${option}</option>`).join('')}</select></label><button class="btn primary" style="margin-top:14px" onclick="saveAttemptAndNext()">${session.index === session.questions.length - 1 ? 'Finalizar' : 'Próxima questão'}</button>`; }
-function saveAttemptAndNext() { const q = session.questions[session.index]; const isCorrect = session.selected === q.correctAnswer; const attempt = { id: uid('att'), questionId: q.id, userId: state.user.id, selectedAnswer: session.selected, isCorrect, confidenceLevel: session.confidence, createdAt: new Date().toISOString() }; state.attempts.push(attempt); session.results.push(attempt); state.user.xp += isCorrect ? 18 : 8; session.index += 1; session.selected = ''; session.answered = false; session.confidence = 'Estava em dúvida'; save(); render(); }
+function saveAttemptAndNext() { const q = session.questions[session.index]; const isCorrect = session.selected === q.correctAnswer; const attempt = { id: uid('att'), questionId: q.id, userId: state.user.id, selectedAnswer: session.selected, isCorrect, confidenceLevel: session.confidence, createdAt: new Date().toISOString() }; state.attempts.push(attempt); session.results.push(attempt); session.index += 1; session.selected = ''; session.answered = false; session.confidence = 'Estava em dúvida'; save(); render(); }
 function sessionSummary() { const total = session.results.length; const correct = session.results.filter((r) => r.isCorrect).length; const confidence = total ? Math.round(session.results.reduce((sum, r) => sum + confidenceScore[r.confidenceLevel], 0) / total * 100) : 0; const zone = zoneForScore(topicPriorityScore(byId(state.topics, session.topicId) || state.topics[0])); return `<section class="diagnosis-card"><span class="eyebrow">Relatório</span><h1>Diagnóstico finalizado</h1><div class="grid cols-4">${statCard('Acertos', correct)}${statCard('Erros', total - correct)}${statCard('Aproveitamento', `${total ? Math.round((correct / total) * 100) : 0}%`)}${statCard('Confiança média', `${confidence}%`)}</div><div class="notice"><strong>Classificação: ${zoneLabel(zone)}</strong><p>Recomendação: estude a teoria de ${esc(topicName(session.topicId))} e refaça uma lista curta de questões.</p></div><button class="btn primary" onclick="session=null; render()">Voltar</button></section>`; }
 
 function flashcardsPage() { return layout(`<div class="between"><div><h1>Flashcards</h1><p class="muted">Revisão por conteúdo com domínio atualizado.</p></div><button class="btn primary" onclick="openModal('flashcard')">Criar flashcard</button></div>${itemList(state.flashcards, flashcardItem)}`); }
-function reviewFlashcard(id, result) { const card = byId(state.flashcards, id); card.lastReviewedAt = today; card.mastery = result === 'errei' ? 'fraco' : result.includes('dificuldade') ? 'revisar' : result.includes('parcialmente') ? 'médio' : 'dominado'; state.flashcardReviews.push({ id: uid('fcr'), flashcardId: id, userId: state.user.id, reviewResult: result, createdAt: new Date().toISOString() }); state.user.xp += result === 'errei' ? 4 : 10; save(); render(); }
+function reviewFlashcard(id, result) { const card = byId(state.flashcards, id); card.lastReviewedAt = today; card.mastery = result === 'errei' ? 'fraco' : result.includes('dificuldade') ? 'revisar' : result.includes('parcialmente') ? 'médio' : 'dominado'; state.flashcardReviews.push({ id: uid('fcr'), flashcardId: id, userId: state.user.id, reviewResult: result, createdAt: new Date().toISOString() }); save(); render(); }
 function examsPage() { return layout(`<div class="between"><div><h1>Provas</h1><p class="muted">Provas aumentam a prioridade dos tópicos vinculados.</p></div><button class="btn primary" onclick="openModal('exam')">Adicionar prova</button></div>${registryList('exams')}`); }
 function tasksPage() { return layout(`<div class="between"><div><h1>Tarefas</h1><p class="muted">Tarefas e trabalhos ligados à agenda.</p></div><button class="btn primary" onclick="openModal('task')">Adicionar tarefa</button></div>${registryList('tasks')}`); }
 function performancePage() { return layout(`<h1>Desempenho</h1>${performanceBlocks()}`); }

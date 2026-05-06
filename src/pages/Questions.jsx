@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { confidenceOptions } from '../data/demoData';
 import { Badge, Button, Card, Field, inputClass } from '../components/ui';
 import { useStudyData } from '../hooks/useStudyData';
-import { addXpToUser, xpForAction } from '../utils/xp';
 
 const blank = (subjectId = '') => ({ statement: '', subjectId, content: '', type: 'múltipla escolha', alternativesText: 'A\nB\nC\nD', correctAnswer: '', explanation: '' });
 
@@ -22,7 +21,7 @@ export default function Questions() {
   function answer(question, selected, confidence) {
     const correct = selected === question.correctAnswer;
     const record = { id: crypto.randomUUID(), questionId: question.id, subjectId: question.subjectId, content: question.content, selected, confidence, correct, answeredAt: new Date().toISOString() };
-    updateData((current) => addXpToUser({ ...current, answers: [...current.answers, record] }, current.currentUserId, xpForAction('question', correct)));
+    updateData((current) => ({ ...current, answers: [...current.answers, record] }));
     setResponses((current) => ({ ...current, [question.id]: { selected: '', confidence: confidenceOptions[0], saved: record } }));
   }
 

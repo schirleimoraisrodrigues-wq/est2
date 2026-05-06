@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { loadData, saveData } from '../services/storage';
 import { applyTheme, toggleThemeValue } from '../utils/theme';
-import { addXpToUser, xpForAction } from '../utils/xp';
 
 const StudyDataContext = createContext(null);
 
@@ -24,10 +23,10 @@ export function StudyDataProvider({ children }) {
   }
 
   function completeTask(taskId) {
-    setData((current) => {
-      const updated = { ...current, tasks: current.tasks.map((task) => (task.id === taskId ? { ...task, status: 'concluída' } : task)) };
-      return addXpToUser(updated, current.currentUserId, xpForAction('task'));
-    });
+    setData((current) => ({
+      ...current,
+      tasks: current.tasks.map((task) => (task.id === taskId ? { ...task, status: 'concluída' } : task)),
+    }));
   }
 
   const value = { data, currentUser, updateData, toggleTheme, completeTask };

@@ -6,7 +6,7 @@ export function loginUser(data, email, password) {
 
 export function registerUser(data, { name, email, password }) {
   if (data.users.some((user) => user.email === email)) throw new Error('Este e-mail já está cadastrado.');
-  const user = { id: crypto.randomUUID(), name, email, password, xp: 0, streak: 1, dailyGoalDone: false, achievements: ['Conta criada'] };
+  const user = { id: crypto.randomUUID(), name, email, password, streak: 1, dailyGoalDone: false, achievements: ['Conta criada'] };
   return { ...data, users: [...data.users, user], currentUserId: user.id };
 }
 

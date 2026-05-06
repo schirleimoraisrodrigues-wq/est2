@@ -1,6 +1,6 @@
 # Terminal engenharia
 
-Terminal engenharia é uma plataforma pessoal de organização e gamificação de estudos.
+Terminal engenharia é uma plataforma pessoal de organização, revisão e estudo ativo de engenharia.
 
 ## Correção definitiva do GitHub Pages
 
@@ -11,6 +11,8 @@ O erro `404 File not found` do GitHub Pages acontece quando a origem publicada n
 - `dist/index.html`, gerado por `npm run build`, para publicação por **GitHub Actions**.
 
 Também há `.nojekyll` na raiz, em `docs/` e no build gerado para impedir processamento do Jekyll.
+
+O workflow também foi simplificado para não declarar `environment` na raiz do YAML; isso evita o erro de validação `Unexpected value 'environment'` que impedia o deploy e fazia o Pages continuar exibindo 404 com uma versão antiga.
 
 
 ## Refatoração minimalista

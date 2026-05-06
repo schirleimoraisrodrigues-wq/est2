@@ -49,7 +49,7 @@ export default function Layout() {
         <button className="rounded-2xl bg-slate-100 p-2 dark:bg-slate-800 lg:hidden" onClick={() => setOpen(true)}>☰</button>
         <div>
           <p className="text-sm text-slate-500 dark:text-slate-400">Olá, {currentUser?.name?.split(' ')[0]} 👋</p>
-          <strong>Organize, revise e ganhe XP</strong>
+          <strong>Organize, revise e acompanhe prioridades</strong>
         </div>
         <button onClick={toggleTheme} className="rounded-2xl bg-slate-100 p-3 text-slate-700 dark:bg-slate-800 dark:text-amber-200" aria-label="Alternar tema">
           {data.theme === 'dark' ? '☀️' : '🌙'}

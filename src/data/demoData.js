@@ -11,7 +11,6 @@ export const demoUser = {
   name: 'Estudante Terminal engenharia',
   email: 'demo@terminalengenharia.app',
   password: '123456',
-  xp: 760,
   streak: 8,
   dailyGoalDone: false,
   achievements: ['Primeira sessão', 'Sequência de 7 dias', 'Mestre dos flashcards'],
