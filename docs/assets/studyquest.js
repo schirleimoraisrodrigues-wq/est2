@@ -147,8 +147,9 @@ function dashboard() {
   const nextExam = [...state.exams].sort((a, b) => a.date.localeCompare(b.date))[0];
   const queue = studyQueue();
   const critical = queue.filter((item) => item.zone === 'critical').length;
-  return layout(`<section class="hero"><div class="between"><div><span class="eyebrow">Olá, ${esc(state.user.name)}</span><h1>Plantão da Engenharia</h1><h2>Painel Geral</h2><p>Modo offline. Hoje vale focar nos temas da prova mais próxima e nos retornos pendentes.</p></div><div class="row"><button class="btn" onclick="go('/configuracoes')">Configurações</button><button class="btn" onclick="setTheme(state.user.theme === 'dark' ? 'light' : 'dark'); render()">${state.user.theme === 'dark' ? 'Modo claro' : 'Modo escuro'}</button></div></div><div class="grid cols-5">${statCard('Próxima prova', nextExam ? `${nextExam.title} · ${relativeDay(nextExam.date)}` : 'Sem prova')}${statCard('Fila de estudos', `${queue.length} tópicos`)}${statCard('Revisões vencidas', dueReviews().length)}${statCard('Tarefas atrasadas', overdueTasks().length)}${statCard('Prioridade crítica', critical)}</div></section>
-  <div class="grid cols-2" style="margin-top:18px"><section class="card"><div class="between"><div><span class="eyebrow">Agenda rápida</span><h2>Calendário de estudos</h2></div><button class="btn" onclick="go('/agenda')">Ver agenda</button></div>${calendar('dash')}<div class="list" style="margin-top:12px">${dayEventsHtml()}</div></section><section class="card"><span class="eyebrow">Mapa de Prioridades</span><h2>Plantão em funcionamento</h2>${priorityMap(true)}</section></div>
+  return layout(`<section class="hero"><div class="between"><div><span class="eyebrow">Olá, ${esc(state.user.name)}</span><h1>Plantão da Engenharia</h1><h2>Painel Geral</h2><p>Modo offline. Hoje vale focar nos temas da prova mais próxima e nas revisões pendentes.</p></div><div class="row"><button class="btn" onclick="go('/configuracoes')">Configurações</button><button class="btn" onclick="setTheme(state.user.theme === 'dark' ? 'light' : 'dark'); render()">${state.user.theme === 'dark' ? 'Modo claro' : 'Modo escuro'}</button></div></div><div class="grid cols-5">${statCard('Próxima prova', nextExam ? `${nextExam.title} · ${relativeDay(nextExam.date)}` : 'Sem prova')}${statCard('Fila de estudos', `${queue.length} tópicos`)}${statCard('Revisões vencidas', dueReviews().length)}${statCard('Tarefas atrasadas', overdueTasks().length)}${statCard('Prioridade crítica', critical)}</div></section>
+  <div class="grid cols-2" style="margin-top:18px"><section class="card"><div class="between"><div><span class="eyebrow">Agenda rápida</span><h2>Calendário de estudos</h2></div><button class="btn" onclick="go('/agenda')">Ver agenda</button></div>${calendar('dash')}<div class="list" style="margin-top:12px">${dayEventsHtml()}</div></section><section class="card"><span class="eyebrow">Mapa de Prioridades</span><h2>Mapa operacional</h2>${priorityMap(true)}</section></div>
+  <div class="grid cols-2" style="margin-top:18px"><section class="card"><div class="between"><div><span class="eyebrow">Agenda rápida</span><h2>Provas próximas</h2></div><button class="btn" onclick="go('/provas')">Ver provas</button></div>${upcomingExamsHtml()}</section><section class="card"><div class="between"><div><span class="eyebrow">Revisões Prioritárias</span><h2>Conteúdos para retorno</h2></div><button class="btn" onclick="go('/central-estudos')">Ver central</button></div>${priorityReturnsHtml()}</section></div>
   <section style="margin-top:22px"><div class="between"><div><span class="eyebrow">Fila de Estudos</span><h1>Tópicos para diagnóstico</h1><p class="muted">Conteúdos puxam a fila quando há prova próxima, baixa confiança ou revisão vencida.</p></div><button class="btn" onclick="go('/cadastro')">Ir para Central de Cadastro</button></div>${studyQueueHtml()}</section>`);
 }
 function relativeDay(date) { const d = daysUntil(date); return d === 0 ? 'hoje' : d === 1 ? 'amanhã' : d > 1 ? `em ${d} dias` : 'atrasada'; }
@@ -158,8 +159,22 @@ function studyQueue() {
     return { topic, score, zone: zoneForScore(score), exam: nextExamForSubject(topic.subjectId), content: recommendedContent(topic.id) };
   }).sort((a, b) => b.score - a.score);
 }
+function diagnosisStatus(topicId) {
+  const attempts = attemptsFor({ topicId });
+  if (!attempts.length) return 'Não avaliado';
+  const topic = byId(state.topics, topicId);
+  return zoneLabel(zoneForScore(topicPriorityScore(topic)));
+}
+function upcomingExamsHtml() {
+  const exams = [...state.exams].sort((a, b) => a.date.localeCompare(b.date)).slice(0, 4);
+  return itemList(exams, (exam) => `<strong>${esc(exam.title)}</strong><div class="muted">${esc(subjectName(exam.subjectId))} · ${relativeDay(exam.date)} · ${esc(exam.preparationStatus)}</div>`);
+}
+function priorityReturnsHtml() {
+  const contents = [...state.contents].filter((content) => priorityForContent(content) >= 55 || content.status === 'revisar depois').sort((a, b) => priorityForContent(b) - priorityForContent(a)).slice(0, 4);
+  return itemList(contents, (content) => `<strong>${esc(content.title)}</strong><div class="muted">${esc(subjectName(content.subjectId))} · ${esc(topicName(content.topicId))} · ${zoneLabel(zoneForScore(priorityForContent(content)))}</div>`);
+}
 function studyQueueHtml(items = studyQueue()) {
-  return `<div class="queue-grid">${items.map(({ topic, zone, exam, content }) => `<article class="card queue-card"><div><span class="avatar">∑</span></div><div><h2>${esc(topic.title)}</h2><p class="muted">${esc(subjectName(topic.subjectId))}</p><p class="muted">${exam ? `${esc(exam.title)}: ${relativeDay(exam.date)}` : 'Sem prova vinculada'}</p><span class="badge">${zoneLabel(zone)}</span><div class="row" style="margin-top:12px"><button class="btn primary" onclick="startDiagnosis('${topic.id}')">Avaliar domínio</button><button class="btn" onclick="go('/conteudo/${content.id}')">Ver teoria</button></div></div></article>`).join('')}</div>`;
+  return `<div class="queue-grid">${items.map(({ topic, zone, exam, content }) => `<article class="card queue-card"><div><span class="avatar">∑</span></div><div><h2>${esc(topic.title)}</h2><p class="muted">${esc(subjectName(topic.subjectId))}</p><p class="muted">${exam ? `${esc(exam.title)}: ${relativeDay(exam.date)}` : 'Sem prova vinculada'}</p><span class="badge">Status: ${diagnosisStatus(topic.id)}</span><span class="badge">${zoneLabel(zone)}</span><div class="row" style="margin-top:12px"><button class="btn primary" onclick="startDiagnosis('${topic.id}')">Avaliar domínio</button><button class="btn" onclick="go('/conteudo/${content.id}')">Ver teoria</button></div></div></article>`).join('')}</div>`;
 }
 function priorityMap(compact = false) {
   const zones = [

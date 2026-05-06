@@ -28,7 +28,7 @@ A versão publicada foi refatorada para uma experiência mais acadêmica e objet
 
 ## Rodada Plantão da Engenharia
 
-A interface agora organiza o estudo como um plantão/triagem de engenharia, sem termos médicos literais:
+A interface agora organiza o estudo como um plantão acadêmico de engenharia, sem termos médicos literais:
 
 - calendário com navegação por mês, botão Hoje, eventos no dia e modal de detalhes;
 - painel geral com próxima prova, fila de estudos, revisões vencidas, tarefas atrasadas e prioridade crítica;
