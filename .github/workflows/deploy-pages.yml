@@ -2,7 +2,8 @@ name: Deploy StudyQuest to GitHub Pages
 
 on:
   push:
-    branches: [main, master]
+    branches:
+      - '**'
   workflow_dispatch:
 
 permissions:
@@ -10,22 +11,33 @@ permissions:
   pages: write
   id-token: write
 
+environment:
+  name: github-pages
+  url: ${{ steps.deployment.outputs.page_url }}
+
 concurrency:
   group: pages
   cancel-in-progress: false
 
 jobs:
   deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
       - name: Build static site
         run: npm run build
+
+      - name: Verify Pages entrypoint
+        run: |
+          test -f dist/index.html
+          test -f dist/404.html
+          test -f dist/assets/studyquest.js
+          test -f dist/assets/studyquest.css
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

@@ -40,6 +40,19 @@ A interface agora organiza o estudo como um plantão acadêmico de engenharia, s
 - tela de entrada com formulário de acesso e liberação apenas pelo botão **Usar offline** enquanto cadastro/login online não estão disponíveis;
 - formulários completos em modal para criar/editar dados, sem `prompt`, `alert` ou cadastro em perguntas sequenciais.
 
+
+## Correção de deploy para evitar 404
+
+O workflow de Pages agora roda em **qualquer branch enviada ao GitHub**, não apenas em `main`/`master`. Isso é importante quando as alterações ainda estão em uma branch de trabalho ou pull request: o GitHub Pages passa a publicar o artefato gerado por `npm run build`, que contém `dist/index.html`, `dist/404.html` e os assets necessários.
+
+Para usar a correção:
+
+1. Vá em **Settings → Pages**.
+2. Em **Source**, selecione **GitHub Actions**.
+3. Faça push desta branch ou rode manualmente o workflow **Deploy StudyQuest to GitHub Pages**.
+
+Se preferir **Deploy from a branch**, selecione a branch que contém este commit e a pasta `/(root)` ou `/docs`, pois ambas contêm `index.html`.
+
 ## Como publicar sem erro
 
 ### Opção 1 — usando exatamente o que aparece no seu print
