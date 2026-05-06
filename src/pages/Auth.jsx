@@ -6,7 +6,7 @@ import { loginUser, registerUser } from '../services/auth';
 
 export default function Auth({ mode }) {
   const isRegister = mode === 'register';
-  const [form, setForm] = useState({ name: '', email: 'demo@studyquest.app', password: '123456' });
+  const [form, setForm] = useState({ name: '', email: 'demo@terminalengenharia.app', password: '123456' });
   const [error, setError] = useState('');
   const { updateData } = useStudyData();
   const navigate = useNavigate();
@@ -24,7 +24,7 @@ export default function Auth({ mode }) {
 
   return <div className="grid min-h-screen place-items-center bg-gradient-to-br from-indigo-600 via-violet-600 to-cyan-500 p-4">
     <Card className="w-full max-w-md">
-      <p className="text-sm font-black uppercase tracking-[0.35em] text-indigo-500">StudyQuest</p>
+      <p className="text-sm font-black uppercase tracking-[0.35em] text-orange-600">Terminal engenharia</p>
       <h1 className="mt-2 text-3xl font-black text-slate-950 dark:text-white">{isRegister ? 'Crie sua conta' : 'Entre na sua guilda de estudos'}</h1>
       <p className="mt-2 text-slate-500 dark:text-slate-400">Autenticação temporária via LocalStorage até Firebase/Supabase ser conectado.</p>
       <form onSubmit={submit} className="mt-6 grid gap-4">

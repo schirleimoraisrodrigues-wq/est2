@@ -8,8 +8,8 @@ export const confidenceOptions = [
 
 export const demoUser = {
   id: 'demo-user',
-  name: 'Estudante StudyQuest',
-  email: 'demo@studyquest.app',
+  name: 'Estudante Terminal engenharia',
+  email: 'demo@terminalengenharia.app',
   password: '123456',
   xp: 760,
   streak: 8,

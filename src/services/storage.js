@@ -1,6 +1,6 @@
 import { initialData } from '../data/demoData';
 
-const STORAGE_KEY = 'studyquest:data:v1';
+const STORAGE_KEY = 'terminal-engenharia:data:v1';
 
 export function loadData() {
   const stored = localStorage.getItem(STORAGE_KEY);

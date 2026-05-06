@@ -10,4 +10,4 @@ for (const target of targets) {
   await cp('assets', `${target}/assets`, { recursive: true });
 }
 
-console.log('StudyQuest minimal static site generated in dist/ and docs/.');
+console.log('Terminal engenharia minimal static site generated in dist/ and docs/.');

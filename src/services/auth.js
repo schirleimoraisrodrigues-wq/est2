@@ -1,6 +1,6 @@
 export function loginUser(data, email, password) {
   const user = data.users.find((item) => item.email === email && item.password === password);
-  if (!user) throw new Error('E-mail ou senha inválidos. Use demo@studyquest.app / 123456 para testar.');
+  if (!user) throw new Error('E-mail ou senha inválidos. Use demo@terminalengenharia.app / 123456 para testar.');
   return { ...data, currentUserId: user.id };
 }
 

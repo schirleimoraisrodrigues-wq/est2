@@ -28,7 +28,7 @@ export default function Layout() {
   const sidebar = <aside className="flex h-full w-72 flex-col bg-slate-950 p-5 text-white">
     <div className="mb-8 flex items-center justify-between">
       <div>
-        <p className="text-xs font-bold uppercase tracking-[0.3em] text-indigo-300">StudyQuest</p>
+        <p className="text-xs font-bold uppercase tracking-[0.3em] text-orange-500">Terminal engenharia</p>
         <h1 className="text-2xl font-black">Level up studies</h1>
       </div>
       <button className="lg:hidden text-2xl" onClick={() => setOpen(false)}>×</button>

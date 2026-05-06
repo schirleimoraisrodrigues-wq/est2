@@ -1,4 +1,4 @@
-name: Deploy StudyQuest to GitHub Pages
+name: Deploy Terminal engenharia to GitHub Pages
 
 on:
   push:

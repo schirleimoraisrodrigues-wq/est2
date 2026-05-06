@@ -5,26 +5,26 @@
   --text: #0f172a;
   --muted: #64748b;
   --border: #e2e8f0;
-  --accent: #2563eb;
-  --accent-soft: #dbeafe;
+  --accent: #ea580c;
+  --accent-soft: #ffedd5;
   --danger: #dc2626;
   --ok: #16a34a;
   --warning: #d97706;
-  --shadow: 0 16px 40px rgba(15, 23, 42, .06);
+  --shadow: 0 12px 30px rgba(15, 23, 42, .045);
 }
 [data-theme="dark"] {
-  --bg: #0b1120;
-  --panel: #111827;
-  --panel-soft: #1e293b;
-  --text: #f8fafc;
-  --muted: #94a3b8;
-  --border: #334155;
-  --accent: #60a5fa;
-  --accent-soft: #172554;
+  --bg: #050505;
+  --panel: #0d0d0d;
+  --panel-soft: #17120d;
+  --text: #fff7ed;
+  --muted: #c2b8ad;
+  --border: #2a2118;
+  --accent: #f97316;
+  --accent-soft: #241306;
   --danger: #fb7185;
-  --ok: #4ade80;
-  --warning: #fbbf24;
-  --shadow: none;
+  --ok: #34d399;
+  --warning: #fb923c;
+  --shadow: 0 18px 42px rgba(0, 0, 0, .34);
 }
 * { box-sizing: border-box; }
 body { margin: 0; min-width: 320px; background: var(--bg); color: var(--text); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -52,7 +52,7 @@ h3 { font-size: 16px; letter-spacing: -.02em; }
 .cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-.card { border: 1px solid var(--border); border-radius: 20px; background: var(--panel); padding: 20px; box-shadow: var(--shadow); }
+.card { border: 1px solid var(--border); border-radius: 18px; background: var(--panel); padding: 20px; box-shadow: var(--shadow); }
 .card.soft { background: var(--panel-soft); box-shadow: none; }
 .metric { display: grid; gap: 5px; }
 .metric strong { font-size: 26px; letter-spacing: -.04em; }
@@ -154,8 +154,16 @@ label { display: grid; gap: 6px; color: var(--muted); font-size: 13px; font-weig
 .notice.error { border-left-color: var(--danger); background: color-mix(in srgb, var(--danger) 8%, var(--panel)); color: var(--text); }
 .notice.success { border-left-color: var(--ok); background: color-mix(in srgb, var(--ok) 8%, var(--panel)); color: var(--text); }
 .notice.info { border-left-color: var(--accent); }
-.hero { color: var(--text); background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 7%, var(--panel)), var(--panel)); }
+.hero { color: var(--text); background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 5%, var(--panel)), var(--panel)); }
 .hero .muted, .hero .eyebrow { color: var(--muted); }
 .hero .card { background: var(--panel); border-color: var(--border); color: var(--text); }
-[data-theme="dark"] .hero { background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 12%, var(--panel)), var(--panel)); }
+[data-theme="dark"] .hero { border-color: color-mix(in srgb, var(--accent) 34%, var(--border)); background: linear-gradient(135deg, #0d0d0d, #120904); }
 @media (max-width: 700px) { .topbar-actions { justify-content: flex-end; flex-wrap: wrap; } .badge { display: none; } }
+[data-theme="dark"] .btn { background: #0d0d0d; border-color: #2a2118; color: var(--text); }
+[data-theme="dark"] .btn:hover { border-color: var(--accent); background: #160b04; }
+[data-theme="dark"] .btn.primary { background: var(--accent); border-color: var(--accent); color: #111; }
+[data-theme="dark"] .input, [data-theme="dark"] textarea, [data-theme="dark"] select { background: #080808; border-color: #2a2118; color: var(--text); }
+[data-theme="dark"] .topbar { background: rgba(5, 5, 5, .86); }
+[data-theme="dark"] .sidebar, [data-theme="dark"] .card, [data-theme="dark"] .modal, [data-theme="dark"] .access-card, [data-theme="dark"] .day, [data-theme="dark"] .item, [data-theme="dark"] .zone { background: #0d0d0d; }
+[data-theme="dark"] .event-pill { background: #1a1008; color: #fdba74; border: 1px solid #3b2312; }
+[data-theme="dark"] .event-prova, [data-theme="dark"] .event-trabalho, [data-theme="dark"] .event-tarefa, [data-theme="dark"] .event-revisão, [data-theme="dark"] .event-aula, [data-theme="dark"] .event-apresentação, [data-theme="dark"] .event-simulado, [data-theme="dark"] .event-evento-acadêmico, [data-theme="dark"] .event-outro { background: #1a1008; color: #fdba74; }

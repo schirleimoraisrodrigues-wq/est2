@@ -1,6 +1,6 @@
-# StudyQuest
+# Terminal engenharia
 
-StudyQuest é uma plataforma pessoal de organização e gamificação de estudos.
+Terminal engenharia é uma plataforma pessoal de organização e gamificação de estudos.
 
 ## Correção definitiva do GitHub Pages
 
@@ -18,6 +18,7 @@ Também há `.nojekyll` na raiz, em `docs/` e no build gerado para impedir proce
 A versão publicada foi refatorada para uma experiência mais acadêmica e objetiva:
 
 - layout minimalista com cards simples, navegação lateral e tema claro/escuro;
+- modo noturno com paleta preta e laranja, alto contraste e menos poluição visual;
 - dados relacionais para matérias, tópicos, conteúdos, questões, tentativas, flashcards, eventos e provas;
 - agenda com eventos vinculados a matérias e tópicos;
 - página de matéria com abas de visão geral, conteúdos, questões, flashcards, arquivos, provas e desempenho;
@@ -26,9 +27,9 @@ A versão publicada foi refatorada para uma experiência mais acadêmica e objet
 - cálculo de prioridade considerando desempenho, confiança, flashcards difíceis, revisão recente e provas próximas.
 
 
-## Rodada Plantão da Engenharia
+## Rodada Terminal engenharia
 
-A interface agora organiza o estudo como um plantão acadêmico de engenharia, sem termos médicos literais:
+A interface agora organiza o estudo como um terminal acadêmico de engenharia, sem termos médicos literais:
 
 - calendário com navegação por mês, botão Hoje, eventos no dia e modal de detalhes;
 - painel geral com próxima prova, fila de estudos, revisões vencidas, tarefas atrasadas e prioridade crítica;
@@ -58,7 +59,7 @@ Para usar a correção:
 
 1. Vá em **Settings → Pages**.
 2. Em **Source**, selecione **GitHub Actions**.
-3. Faça push desta branch ou rode manualmente o workflow **Deploy StudyQuest to GitHub Pages**.
+3. Faça push desta branch ou rode manualmente o workflow **Deploy Terminal engenharia to GitHub Pages**.
 
 Se preferir **Deploy from a branch**, selecione a branch que contém este commit e a pasta `/(root)` ou `/docs`, pois ambas contêm `index.html`.
 
@@ -90,7 +91,7 @@ Essa opção usa `docs/index.html`, que é uma cópia do app.
 
 1. Vá em **Settings → Pages**.
 2. Em **Source**, escolha **GitHub Actions**.
-3. Rode o workflow **Deploy StudyQuest to GitHub Pages**.
+3. Rode o workflow **Deploy Terminal engenharia to GitHub Pages**.
 
 Essa opção usa `npm run build`, gera `dist/` e publica o artefato.
 
